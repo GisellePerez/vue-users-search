@@ -1,27 +1,66 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <h1>
+    {{ title }}
+  </h1>
+  <SearchBar @search="fetchData" @clear="clearResults" />
+  <RepositoriesList :items="items" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
+
+import RepositoriesList from "./components/RepositoriesList.vue";
+import SearchBar from "./components/SearchBar.vue";
+
+type Item = {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+};
 
 export default defineComponent({
   name: "App",
+
   components: {
-    HelloWorld,
+    RepositoriesList,
+    SearchBar,
+  },
+
+  data() {
+    return {
+      title: "Searching repos with vue",
+      items: [] as Item[],
+    };
+  },
+
+  methods: {
+    async fetchData(query: string) {
+      console.log("Search event triggered", query);
+
+      await fetch("https://jsonplaceholder.typicode.com/todos/1")
+        .then((response) => response.json())
+        .then((json) => {
+          console.log(json);
+          return json;
+        })
+        .then((res: Item) => (this.items = [res]));
+    },
+
+    clearResults() {
+      this.items = [];
+    },
   },
 });
 </script>
 
 <style>
-#app {
+/* #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
+} */
 </style>
