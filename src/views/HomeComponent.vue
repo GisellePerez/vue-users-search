@@ -3,6 +3,17 @@
 
   <SearchBar @search="fetchData" @clear="clearResults" />
 
+  <v-select
+    label="Sort by"
+    :items="sortOptions"
+    density="compact"
+    item-title="label"
+    item-value="value"
+    @input="changeSortBy"
+    v-model="sortBy"
+    :disabled="!storedQuery"
+  ></v-select>
+
   <p v-if="isLoading">Loading...</p>
   <RepositoriesList :items="items" />
 </template>
@@ -15,6 +26,8 @@ import SearchBar from "../components/SearchBar.vue";
 
 import { Repo } from "../types";
 
+type SortOption = { label: string; value: string };
+
 export default defineComponent({
   name: "HomeComponent",
 
@@ -26,34 +39,69 @@ export default defineComponent({
   data() {
     return {
       title: "Searching repos with vue",
+
+      storedQuery: "",
       items: [] as Repo[],
+
       isLoading: false,
+
+      sortOptions: [
+        { value: "stars", label: "Stars" },
+        { value: "forks", label: "Forks" },
+        { value: "help-wanted-issues", label: "Help wanted issues" },
+        { value: "updated", label: "Updated" },
+      ],
+      sortBy: { value: "", label: "" } as SortOption,
     };
   },
 
   methods: {
-    async fetchData(query: string) {
+    storeQuery(query: string) {
+      this.storedQuery = query;
+    },
+
+    async fetchData(query: string, sortBy?: string) {
       this.isLoading = true;
-      console.log("Search event triggered", query);
+
+      this.storedQuery = query;
+      console.log("Search event triggered", { query }, { sortBy });
 
       await fetch(
-        // eslint-disable-next-line prettier/prettier
-        `https://api.github.com/search/repositories?q=tetris&per_page=2`,
+        `https://api.github.com/search/repositories?q=${query}&per_page=2&sort=${
+          sortBy || ""
+          // eslint-disable-next-line prettier/prettier
+        }`,
       )
         .then((response) => response.json())
         .then((json) => {
-          console.log("------------ aaaaa");
           console.log(json);
           return json;
         })
         .then((res) => {
+          debugger;
           this.isLoading = false;
           this.items = res.items;
         });
     },
 
+    changeSortBy(event: any) {
+      this.sortBy = event.target.value;
+    },
+
     clearResults() {
       this.items = [];
+    },
+  },
+
+  watch: {
+    storedQuery: function (val, oldVal) {
+      console.log({ val });
+    },
+
+    sortBy: function (val, oldVal) {
+      if (val && this.storedQuery) {
+        this.fetchData(this.storedQuery, val);
+      }
     },
   },
 });
