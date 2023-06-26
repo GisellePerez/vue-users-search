@@ -1,8 +1,8 @@
 <template>
-  <div v-if="items?.length">
+  <div v-if="repos?.length">
     <p>Results</p>
 
-    <ListItem v-for="item in items" :key="item.id" :item="item" />
+    <ListItem v-for="repo in repos" :key="repo.id" :repo="repo" />
   </div>
   <p v-else>No items to display.</p>
 </template>
@@ -15,7 +15,7 @@ import ListItem from "./ListItem.vue";
 export default defineComponent({
   name: "RepositoriesList",
 
-  props: ["items"],
+  props: ["repos"],
 
   components: { ListItem },
 });

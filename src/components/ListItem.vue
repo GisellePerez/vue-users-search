@@ -1,6 +1,6 @@
 <template>
-  <RouterLink :to="{ name: 'RepositoryDetail', params: { id: item.id } }">
-    <h3>{{ item.id }} - {{ item.name }}</h3>
+  <RouterLink :to="{ name: 'RepositoryDetail', params: { id: repo.id } }">
+    <h3>{{ repo.id }} - {{ repo.name }}</h3>
   </RouterLink>
 </template>
 
@@ -9,8 +9,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "ListItem",
-
-  props: ["item"],
+  props: ["repo"],
 });
 </script>
 

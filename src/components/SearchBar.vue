@@ -1,13 +1,23 @@
 <template>
-  <input
-    type="text"
-    placeholder="Search something..."
-    :value="query"
-    @input="query = ($event.target as HTMLInputElement).value"
-  />
+  <div class="search-bar-wrapper">
+    <v-text-field
+      type="text"
+      placeholder="Search something..."
+      :value="query"
+      @input="query = ($event.target as HTMLInputElement).value"
+      @click:append="clearValue"
+      density="compact"
+      append-icon="mdi-close"
+      :loading="isLoading"
+      :disabled="isLoading"
+    />
 
-  <button @click="$emit('search', query)">Search</button>
-  <button @click="$emit('clear')">clear</button>
+    <v-btn
+      @click="$emit('search', query)"
+      :disabled="!query"
+      icon="mdi-magnify"
+    ></v-btn>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,6 +26,8 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "SearchBar",
 
+  props: ["isLoading"],
+
   emits: ["search", "clear"],
 
   data() {
@@ -23,7 +35,19 @@ export default defineComponent({
       query: "",
     };
   },
+
+  methods: {
+    clearValue() {
+      this.query = "";
+      this.$emit("clear");
+    },
+  },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.search-bar-wrapper {
+  display: flex;
+  gap: 2rem;
+}
+</style>

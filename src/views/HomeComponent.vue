@@ -1,21 +1,26 @@
 <template>
   <h1>{{ title }}</h1>
 
-  <SearchBar @search="fetchData" @clear="clearResults" />
+  <div class="filters-wrapper">
+    <SearchBar
+      @search="fetchData"
+      @clear="clearResults"
+      :isLoading="isLoading"
+    />
 
-  <v-select
-    label="Sort by"
-    :items="sortOptions"
-    density="compact"
-    item-title="label"
-    item-value="value"
-    @input="changeSortBy"
-    v-model="sortBy"
-    :disabled="!storedQuery"
-  ></v-select>
+    <v-select
+      label="Sort by"
+      :items="sortOptions"
+      density="compact"
+      item-title="label"
+      item-value="value"
+      @input="changeSortBy"
+      v-model="sortBy"
+      :disabled="!locallyStoredQuery || isLoading"
+    ></v-select>
+  </div>
 
-  <p v-if="isLoading">Loading...</p>
-  <RepositoriesList :items="items" />
+  <RepositoriesList :repos="repos" />
 </template>
 
 <script lang="ts">
@@ -27,6 +32,14 @@ import SearchBar from "../components/SearchBar.vue";
 import { Repo } from "../types";
 
 type SortOption = { label: string; value: string };
+
+const _sortOptions: SortOption[] = [
+  { value: "stars", label: "Stars" },
+  { value: "forks", label: "Forks" },
+  { value: "help-wanted-issues", label: "Help wanted issues" },
+  { value: "updated", label: "Updated" },
+];
+const defaultSortOption: SortOption = { value: "", label: "" };
 
 export default defineComponent({
   name: "HomeComponent",
@@ -40,30 +53,25 @@ export default defineComponent({
     return {
       title: "Searching repos with vue",
 
-      storedQuery: "",
-      items: [] as Repo[],
+      locallyStoredQuery: "",
+      repos: [] as Repo[],
 
       isLoading: false,
 
-      sortOptions: [
-        { value: "stars", label: "Stars" },
-        { value: "forks", label: "Forks" },
-        { value: "help-wanted-issues", label: "Help wanted issues" },
-        { value: "updated", label: "Updated" },
-      ],
-      sortBy: { value: "", label: "" } as SortOption,
+      sortOptions: _sortOptions,
+      sortBy: defaultSortOption as SortOption,
     };
   },
 
   methods: {
-    storeQuery(query: string) {
-      this.storedQuery = query;
+    storeQueryLocally(query: string) {
+      this.locallyStoredQuery = query;
     },
 
     async fetchData(query: string, sortBy?: string) {
       this.isLoading = true;
 
-      this.storedQuery = query;
+      this.locallyStoredQuery = query;
       console.log("Search event triggered", { query }, { sortBy });
 
       await fetch(
@@ -74,13 +82,12 @@ export default defineComponent({
       )
         .then((response) => response.json())
         .then((json) => {
-          console.log(json);
           return json;
         })
         .then((res) => {
           debugger;
           this.isLoading = false;
-          this.items = res.items;
+          this.repos = res.items;
         });
     },
 
@@ -89,22 +96,30 @@ export default defineComponent({
     },
 
     clearResults() {
-      this.items = [];
+      this.repos = [];
+      this.sortBy = defaultSortOption;
+      this.locallyStoredQuery = "";
     },
   },
 
   watch: {
-    storedQuery: function (val, oldVal) {
-      console.log({ val });
-    },
+    // locallyStoredQuery: function (val, oldVal) {
+    //   console.log({ val });
+    // },
 
     sortBy: function (val, oldVal) {
-      if (val && this.storedQuery) {
-        this.fetchData(this.storedQuery, val);
+      if (val && this.locallyStoredQuery) {
+        this.fetchData(this.locallyStoredQuery, val);
       }
     },
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.filters-wrapper {
+  display: grid;
+  grid-template-columns: auto 25%;
+  gap: 2rem;
+}
+</style>
