@@ -1,5 +1,7 @@
 <template>
-  <h3>{{ item.id }} - {{ item.title }}</h3>
+  <RouterLink :to="{ name: 'RepositoryDetail', params: { id: item.id } }">
+    <h3>{{ item.id }} - {{ item.title }}</h3>
+  </RouterLink>
 </template>
 
 <script lang="ts">
