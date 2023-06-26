@@ -3,6 +3,7 @@
 
   <SearchBar @search="fetchData" @clear="clearResults" />
 
+  <p v-if="isLoading">Loading...</p>
   <RepositoriesList :items="items" />
 </template>
 
@@ -12,12 +13,7 @@ import { defineComponent } from "vue";
 import RepositoriesList from "../components/RepositoriesList.vue";
 import SearchBar from "../components/SearchBar.vue";
 
-type Item = {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
-};
+import { Repo } from "../types";
 
 export default defineComponent({
   name: "HomeComponent",
@@ -30,21 +26,30 @@ export default defineComponent({
   data() {
     return {
       title: "Searching repos with vue",
-      items: [] as Item[],
+      items: [] as Repo[],
+      isLoading: false,
     };
   },
 
   methods: {
     async fetchData(query: string) {
+      this.isLoading = true;
       console.log("Search event triggered", query);
 
-      await fetch("https://jsonplaceholder.typicode.com/todos/1")
+      await fetch(
+        // eslint-disable-next-line prettier/prettier
+        `https://api.github.com/search/repositories?q=tetris&per_page=2`,
+      )
         .then((response) => response.json())
         .then((json) => {
+          console.log("------------ aaaaa");
           console.log(json);
           return json;
         })
-        .then((res: Item) => (this.items = [res]));
+        .then((res) => {
+          this.isLoading = false;
+          this.items = res.items;
+        });
     },
 
     clearResults() {
