@@ -1,15 +1,18 @@
 <template>
-  <RouterLink :to="{ name: 'RepositoryDetail', params: { id: repo.id } }">
-    <h3>{{ repo.id }} - {{ repo.name }}</h3>
+  <RouterLink :to="{ name: 'RepositoryDetail', params: { id: repo?.id } }">
+    <h3>{{ repo?.id }} - {{ repo?.name }}</h3>
   </RouterLink>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
+import { Repo } from "../types";
 
 export default defineComponent({
   name: "ListItem",
-  props: ["repo"],
+  props: {
+    repo: Object as PropType<Repo>,
+  },
 });
 </script>
 
