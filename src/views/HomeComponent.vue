@@ -1,12 +1,49 @@
 <template>
+  <SearchBar />
+
+  <RepositoriesList :repos="repos" />
+</template>
+
+<script lang="ts">
+import { computed } from "vue";
+import { useStore } from "vuex";
+
+import SearchBar from "@/components/SearchBar.vue";
+import RepositoriesList from "@/components/RepositoriesList.vue";
+
+export default {
+  components: {
+    SearchBar,
+    RepositoriesList,
+  },
+
+  setup() {
+    const store = useStore();
+    const repos = computed(() => store.state.repos);
+
+    return {
+      repos,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.filters-wrapper {
+  display: grid;
+  grid-template-columns: auto 25%;
+  gap: 2rem;
+}
+</style>
+
+<!-- <template>
   <h1>{{ title }}</h1>
 
   <div class="filters-wrapper">
-    <SearchBar
-      @search="fetchData"
-      @clear="clearResults"
-      :isLoading="isLoading"
-    />
+    <SearchBar />
+    @search="fetchData"
+      :isLoading="isLoading" 
+    @clear="clearResults" 
 
     <v-select
       label="Sort by"
@@ -45,9 +82,9 @@ import { defineComponent } from "vue";
 import RepositoriesList from "../components/RepositoriesList.vue";
 import SearchBar from "../components/SearchBar.vue";
 
-import { Repo } from "../types";
+import { Repo, SortOption } from "../types";
 
-type SortOption = { label: string; value: string };
+import { mapState, mapGetters, mapActions, Store } from "vuex";
 
 const _sortOptions: SortOption[] = [
   { value: "stars", label: "Stars" },
@@ -65,9 +102,9 @@ export default defineComponent({
     SearchBar,
   },
 
-  data() {
+  data: () => {
     return {
-      title: "Searching repos with vue",
+      // title: "Searching repos with vue",
 
       locallyStoredQuery: "",
       repos: [] as Repo[],
@@ -99,6 +136,11 @@ export default defineComponent({
   },
 
   computed: {
+    ...mapState(["title"]),
+    // title() {
+    //   this.$store.state.title;
+    // },
+
     totalPages() {
       return this.repos?.length
         ? Math.ceil(this.repos.length / this.itemsPerPage)
@@ -107,10 +149,10 @@ export default defineComponent({
 
     displayedItems() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
+      const endIndex = startIndex + this?.itemsPerPage;
 
       console.log({ startIndex, endIndex });
-      return this.repos.slice(startIndex, endIndex);
+      return this?.repos?.slice(startIndex, endIndex);
     },
   },
 
@@ -127,7 +169,7 @@ export default defineComponent({
       }
     },
 
-    changePage(pageNumber) {
+    changePage(pageNumber: number) {
       this.currentPage = pageNumber;
     },
 
@@ -156,6 +198,7 @@ export default defineComponent({
           this.isLoading = false;
           this.repos = res.items;
           this.totalRepos = res.total_count;
+          // this.store.s
         });
     },
 
@@ -186,4 +229,4 @@ export default defineComponent({
   grid-template-columns: auto 25%;
   gap: 2rem;
 }
-</style>
+</style> -->

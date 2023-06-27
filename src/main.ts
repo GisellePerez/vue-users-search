@@ -12,6 +12,22 @@ import * as directives from "vuetify/directives";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 import "@mdi/font/css/materialdesignicons.css";
 
+// Store
+import store from "./store";
+// import { createStore } from "vuex";
+// const store = createStore<{ count: number }>({
+//   state() {
+//     return {
+//       count: 0,
+//     };
+//   },
+//   mutations: {
+//     increment(state) {
+//       state.count++;
+//     },
+//   },
+// });
+
 const vuetify = createVuetify({
   icons: {
     defaultSet: "mdi",
@@ -24,4 +40,4 @@ const vuetify = createVuetify({
   directives,
 });
 
-createApp(App).use(router).use(vuetify).mount("#app");
+createApp(App).use(router).use(vuetify).use(store).mount("#app");

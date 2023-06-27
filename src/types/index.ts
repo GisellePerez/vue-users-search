@@ -105,3 +105,5 @@ export type SearchRepositoriesResponse = {
   items: Repo[];
   total_count: number;
 };
+
+export type SortOption = { label: string; value: string };

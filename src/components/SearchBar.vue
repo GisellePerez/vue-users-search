@@ -1,53 +1,54 @@
 <template>
-  <div class="search-bar-wrapper">
+  <div>
     <v-text-field
       type="text"
-      placeholder="Search something..."
-      :value="query"
-      @input="query = ($event.target as HTMLInputElement).value"
-      @click:append="clearValue"
+      v-model="searchBarValue"
+      @input="searchBarValue.updateSearchBarValue"
+      @click:append="handleClear"
       density="compact"
       append-icon="mdi-close"
-      :loading="isLoading"
-      :disabled="isLoading"
     />
-
-    <v-btn
-      @click="$emit('search', query)"
-      :disabled="!query"
-      icon="mdi-magnify"
-    ></v-btn>
   </div>
+
+  <v-btn
+    icon="mdi-magnify"
+    @click="handleSearch"
+    @keypress.enter="handleSearch"
+  ></v-btn>
+
+  {{ searchBarValue }}
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, ref } from "vue";
+import { useStore } from "vuex";
 
-export default defineComponent({
-  name: "SearchBar",
+export default {
+  setup() {
+    const store = useStore();
 
-  props: ["isLoading"],
+    const searchBarValue = computed({
+      get() {
+        return store.state.searchBarValue;
+      },
+      set(value) {
+        store.dispatch("updateSearchBarValue", value);
+      },
+    });
 
-  emits: ["search", "clear"],
+    function handleSearch() {
+      store.dispatch("fetchRepos");
+    }
 
-  data() {
+    function handleClear() {
+      store.dispatch("clearValue");
+    }
+
     return {
-      query: "",
+      searchBarValue,
+      handleSearch,
+      handleClear,
     };
   },
-
-  methods: {
-    clearValue() {
-      this.query = "";
-      this.$emit("clear");
-    },
-  },
-});
+};
 </script>
-
-<style scoped>
-.search-bar-wrapper {
-  display: flex;
-  gap: 2rem;
-}
-</style>
