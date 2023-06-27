@@ -1,15 +1,60 @@
 <template>
   <SearchBar />
 
+  <v-select
+    label="Sort by"
+    :items="sortOptions"
+    density="compact"
+    item-title="label"
+    item-value="value"
+    @input="sortBy.setSortBy"
+    v-model="sortBy"
+    :disabled="!repos.length || isLoading"
+  ></v-select>
+
   <RepositoriesList :repos="repos" />
+
+  <ul>
+    <li v-for="item in repos" :key="item.id">{{ item.name }}</li>
+  </ul>
+
+  <div class="pagination">
+    <v-btn :disabled="currentPage === 1" @click="changePage(currentPage - 1)">
+      Previous
+    </v-btn>
+    <!-- <span>{{ currentPage }}</span> -->
+
+    <v-btn
+      v-for="pageNumber in totalPages"
+      :key="pageNumber"
+      @click="changePage(pageNumber)"
+    >
+      {{ pageNumber }}
+    </v-btn>
+
+    <v-btn
+      :disabled="currentPage === totalPages"
+      @click="changePage(currentPage + 1)"
+    >
+      Next
+    </v-btn>
+  </div>
 </template>
 
 <script lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 
 import SearchBar from "@/components/SearchBar.vue";
 import RepositoriesList from "@/components/RepositoriesList.vue";
+import { SortOption } from "@/types";
+
+const _sortOptions: SortOption[] = [
+  { value: "stars", label: "Stars" },
+  { value: "forks", label: "Forks" },
+  { value: "help-wanted-issues", label: "Help wanted issues" },
+  { value: "updated", label: "Last Updated" },
+];
 
 export default {
   components: {
@@ -19,10 +64,38 @@ export default {
 
   setup() {
     const store = useStore();
-    const repos = computed(() => store.state.repos);
+    // const repos = computed(() => store.state.repos);
+
+    const isLoading = computed(() => store.state.isLoading);
+    const searchBarValue = computed(() => store.state.searchBarValue);
+
+    const currentPage = ref(1);
+    const repos = computed(() => store.getters.displayedItems);
+    const totalPages = computed(() => store.getters.totalPages);
+
+    const sortBy = computed({
+      get() {
+        return store.state.sortBy;
+      },
+      set(value) {
+        store.dispatch("updateSortBy", value);
+      },
+    });
+
+    const changePage = (pageNumber: number) => {
+      store.dispatch("changePage", pageNumber);
+      currentPage.value = pageNumber;
+    };
 
     return {
       repos,
+      sortOptions: _sortOptions,
+      sortBy,
+      isLoading,
+      searchBarValue,
+      currentPage,
+      changePage,
+      totalPages,
     };
   },
 };

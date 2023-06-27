@@ -29,6 +29,16 @@ const store = createStore<StoreType>({
       isLoading: false,
     };
   },
+  getters: {
+    totalPages(state) {
+      return Math.ceil(state.repos.length / state.itemsPerPage);
+    },
+    displayedItems(state) {
+      const start = (state.currentPage - 1) * state.itemsPerPage;
+      const end = start + state.itemsPerPage;
+      return state.repos.slice(start, end);
+    },
+  },
   mutations: {
     // increment(state) {
     //   state.count++;
@@ -64,6 +74,14 @@ const store = createStore<StoreType>({
     setRepoContributors(state, loading) {
       state.repoContributors = loading;
     },
+
+    setCurrentPage(state, pageNumber) {
+      state.currentPage = pageNumber;
+    },
+
+    setSortBy(state, sortSelection: SortOption) {
+      state.sortBy = sortSelection;
+    },
   },
   actions: {
     updateSearchBarValue({ commit }, value) {
@@ -71,11 +89,22 @@ const store = createStore<StoreType>({
       // commit("setCurrentPage", 1);
     },
 
+    updateSortBy({ commit, dispatch }, value) {
+      commit("setSortBy", value);
+
+      // commit("sortItems");
+      dispatch("changePage", 1);
+      dispatch("fetchRepos");
+    },
+
     clearValue({ commit }) {
       commit("clearValue");
     },
 
     async fetchRepos({ commit, state }) {
+      debugger;
+      console.log(state.sortBy);
+
       console.log("fetch", state.searchBarValue);
       commit("setIsLoading", true);
       // console.log("Search event triggered", { query }, { sortBy });
@@ -84,8 +113,10 @@ const store = createStore<StoreType>({
       //   sortBy || ""
 
       return await fetch(
-        // eslint-disable-next-line prettier/prettier
-        `https://api.github.com/search/repositories?q=${state.searchBarValue}&per_page=12&sort=`,
+        `https://api.github.com/search/repositories?q=${
+          state.searchBarValue
+          // eslint-disable-next-line prettier/prettier
+        }&per_page=12&sort=${state.sortBy || ""}`,
       )
         .then((response) => response.json())
         .then((json) => json)
@@ -116,6 +147,10 @@ const store = createStore<StoreType>({
 
     updateRepos({ commit }, value) {
       commit("updateRepos", value);
+    },
+
+    changePage({ commit }, pageNumber) {
+      commit("setCurrentPage", pageNumber);
     },
   },
 });

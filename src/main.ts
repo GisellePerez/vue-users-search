@@ -14,19 +14,6 @@ import "@mdi/font/css/materialdesignicons.css";
 
 // Store
 import store from "./store";
-// import { createStore } from "vuex";
-// const store = createStore<{ count: number }>({
-//   state() {
-//     return {
-//       count: 0,
-//     };
-//   },
-//   mutations: {
-//     increment(state) {
-//       state.count++;
-//     },
-//   },
-// });
 
 const vuetify = createVuetify({
   icons: {

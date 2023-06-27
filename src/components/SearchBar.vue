@@ -2,11 +2,12 @@
   <div>
     <v-text-field
       type="text"
+      density="compact"
+      append-icon="mdi-close"
       v-model="searchBarValue"
       @input="searchBarValue.updateSearchBarValue"
       @click:append="handleClear"
-      density="compact"
-      append-icon="mdi-close"
+      :isLoading="isLoading"
     />
   </div>
 
@@ -14,9 +15,8 @@
     icon="mdi-magnify"
     @click="handleSearch"
     @keypress.enter="handleSearch"
+    :disabled="!searchBarValue || isLoading"
   ></v-btn>
-
-  {{ searchBarValue }}
 </template>
 
 <script lang="ts">
@@ -26,6 +26,8 @@ import { useStore } from "vuex";
 export default {
   setup() {
     const store = useStore();
+
+    const isLoading = computed(() => store.state.isLoading);
 
     const searchBarValue = computed({
       get() {
@@ -48,6 +50,7 @@ export default {
       searchBarValue,
       handleSearch,
       handleClear,
+      isLoading,
     };
   },
 };
