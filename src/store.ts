@@ -23,7 +23,7 @@ const store = createStore<StoreType>({
       repoContributors: [],
       query: "",
       searchBarValue: "",
-      itemsPerPage: 5,
+      itemsPerPage: 6,
       currentPage: 1,
       sortBy: { label: "", value: "" },
       isLoading: false,
@@ -40,14 +40,6 @@ const store = createStore<StoreType>({
     },
   },
   mutations: {
-    // increment(state) {
-    //   state.count++;
-    // },
-    // updateQuery(state, newQuery) {
-    //   console.log({ newQuery });
-    //   state.query = newQuery;
-    // },
-
     clearValue(state) {
       state.query = "";
       state.searchBarValue = "";
@@ -102,34 +94,21 @@ const store = createStore<StoreType>({
     },
 
     async fetchRepos({ commit, state }) {
-      debugger;
-      console.log(state.sortBy);
-
-      console.log("fetch", state.searchBarValue);
       commit("setIsLoading", true);
-      // console.log("Search event triggered", { query }, { sortBy });
-
-      // `https://api.github.com/search/repositories?q=${state.searchBarValue}&per_page=12&sort=${
-      //   sortBy || ""
 
       return await fetch(
         `https://api.github.com/search/repositories?q=${
           state.searchBarValue
           // eslint-disable-next-line prettier/prettier
-        }&per_page=12&sort=${state.sortBy || ""}`,
+        }&per_page=18&sort=${state.sortBy || ""}`,
       )
         .then((response) => response.json())
         .then((json) => json)
         .then((res) => {
-          debugger;
           commit("setRepos", res.items);
           commit("setTotalRepos", res.total_count);
 
           commit("setIsLoading", false);
-
-          // state.isLoading = false;
-          // state.repos = res.items;
-          // state.totalRepos = res.total_count;
         })
         .catch((e) => console.log(e));
     },
@@ -139,8 +118,6 @@ const store = createStore<StoreType>({
         .then((response) => response.json())
         .then((json) => json)
         .then((res) => {
-          debugger;
-          console.log({ res });
           commit("setRepoContributors", res);
         });
     },

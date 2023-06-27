@@ -1,22 +1,28 @@
 <template>
-  <div>
-    <v-text-field
-      type="text"
-      density="compact"
-      append-icon="mdi-close"
-      v-model="searchBarValue"
-      @input="searchBarValue.updateSearchBarValue"
-      @click:append="handleClear"
-      :isLoading="isLoading"
-    />
-  </div>
+  <v-row>
+    <v-col cols="11">
+      <v-text-field
+        placeholder="Type something"
+        type="text"
+        density="compact"
+        append-icon="mdi-close"
+        v-model="searchBarValue"
+        @input="searchBarValue.updateSearchBarValue"
+        @click:append="handleClear"
+        :isLoading="isLoading"
+      />
+    </v-col>
 
-  <v-btn
-    icon="mdi-magnify"
-    @click="handleSearch"
-    @keypress.enter="handleSearch"
-    :disabled="!searchBarValue || isLoading"
-  ></v-btn>
+    <v-col cols="1">
+      <v-btn
+        icon="mdi-magnify"
+        @click="handleSearch"
+        @keypress.enter="handleSearch"
+        :disabled="!searchBarValue || isLoading"
+        size="small"
+      ></v-btn>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">

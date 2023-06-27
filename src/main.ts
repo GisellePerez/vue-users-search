@@ -23,6 +23,9 @@ const vuetify = createVuetify({
       mdi,
     },
   },
+  theme: {
+    defaultTheme: "dark",
+  },
   components,
   directives,
 });
